@@ -1,0 +1,31 @@
+import javax.swing.*;
+import javax.swing.table.DefaultTableModel;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.io.*;
+class Course implements Serializable {
+    private String courseId;
+    private String courseName;
+    private CourseType courseType;
+
+    // Constructor
+    public Course(String courseId, String courseName, CourseType courseType) {
+        this.courseId = courseId;
+        this.courseName = courseName;
+        this.courseType = courseType;
+    }
+
+    // Getter methods
+    public String getCourseId() {
+        return courseId;
+    }
+
+    public String getCourseName() {
+        return courseName;
+    }
+
+    public CourseType getCourseType() {
+        return courseType;
+    }
+}
