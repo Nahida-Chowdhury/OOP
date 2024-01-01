@@ -1,0 +1,132 @@
+import javax.swing.*;
+import javax.swing.table.DefaultTableModel;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.io.*;
+public class UniversityManagementSystemGUI {
+    private JFrame frame;
+    private JTextField studentIdField, studentNameField, courseIdField, courseNameField;
+    private JComboBox<CourseType> courseTypeComboBox;
+    private DefaultTableModel tableModel;
+    private JTable dataTable;
+
+    public UniversityManagementSystemGUI() {
+        // Create the main frame
+        frame = new JFrame("University Management System");
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.setSize(600, 400);
+        frame.setLayout(new BorderLayout());
+
+        // Create and add components to the frame
+        JPanel inputPanel = new JPanel(new GridLayout(3, 3));
+
+        inputPanel.add(new JLabel("Student ID:"));
+        studentIdField = new JTextField();
+        inputPanel.add(studentIdField);
+
+        inputPanel.add(new JLabel("Student Name:"));
+        studentNameField = new JTextField();
+        inputPanel.add(studentNameField);
+
+        inputPanel.add(new JLabel("Course ID:"));
+        courseIdField = new JTextField();
+        inputPanel.add(courseIdField);
+
+        inputPanel.add(new JLabel("Course Name:"));
+        courseNameField = new JTextField();
+        inputPanel.add(courseNameField);
+
+        inputPanel.add(new JLabel("Course Type:"));
+        courseTypeComboBox = new JComboBox<>(CourseType.values());
+        inputPanel.add(courseTypeComboBox);
+
+        JButton saveButton = new JButton("Save");
+        inputPanel.add(saveButton);
+
+        // Add action listener to the save button
+        saveButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                saveDataToFile();
+                updateTable();
+            }
+        });
+
+        frame.add(inputPanel, BorderLayout.NORTH);
+
+        // Create table model and table
+        tableModel = new DefaultTableModel();
+        tableModel.addColumn("Student ID");
+        tableModel.addColumn("Student Name");
+        tableModel.addColumn("Course ID");
+        tableModel.addColumn("Course Name");
+        tableModel.addColumn("Course Type");
+
+        dataTable = new JTable(tableModel);
+        frame.add(new JScrollPane(dataTable), BorderLayout.CENTER);
+    }
+
+    // Method to save data to a file using object serialization
+    private void saveDataToFile() {
+        try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream("university_data.ser"))) {
+            // Create Student object
+            Student student = new Student(studentIdField.getText(), studentNameField.getText());
+
+            // Create Course object
+            Course course = new Course(courseIdField.getText(), courseNameField.getText(),
+                    (CourseType) courseTypeComboBox.getSelectedItem());
+
+            // Enroll the student in the course
+            student.enrollInCourse(course);
+
+            // Write objects to the file
+            oos.writeObject(student);
+            oos.writeObject(course);
+
+            System.out.println("Data saved to university_data.ser");
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        }
+    }
+
+    // Method to update the table with data from the file
+    private void updateTable() {
+        try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream("university_data.ser"))) {
+
+            while (true) {
+                try {
+                    // Read Student and Course objects from the file
+                    Student student = (Student) ois.readObject();
+                    Course course = (Course) ois.readObject();
+
+                    // Add data to the table model
+                    tableModel.addRow(new Object[]{
+                            student.getStudentId(),
+                            student.getStudentName(),
+                            course.getCourseId(),
+                            course.getCourseName(),
+                            course.getCourseType()
+                    });
+                } catch (EOFException e) {
+                    break; // End of file reached
+                }
+            }
+        } catch (IOException | ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void display() {
+        // Make the frame visible
+        frame.setVisible(true);
+    }
+
+    public static void main(String[] args) {
+        // Create an instance of the GUI
+        UniversityManagementSystemGUI gui = new UniversityManagementSystemGUI();
+
+        // Display the GUI
+        gui.display();
+    }
+}
