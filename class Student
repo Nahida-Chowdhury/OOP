@@ -1,0 +1,30 @@
+import javax.swing.*;
+import javax.swing.table.DefaultTableModel;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.io.*;
+class Student implements Serializable {
+    private String studentId;
+    private String studentName;
+
+    // Constructor
+    public Student(String studentId, String studentName) {
+        this.studentId = studentId;
+        this.studentName = studentName;
+    }
+
+    // Getter methods
+    public String getStudentId() {
+        return studentId;
+    }
+
+    public String getStudentName() {
+        return studentName;
+    }
+
+    // Method to enroll in a course
+    public void enrollInCourse(Course course) {
+        System.out.println(studentName + " is enrolled in the course: " + course.getCourseName());
+    }
+}
